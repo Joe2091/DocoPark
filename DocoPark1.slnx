@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="DocoPark.BusinessLogic/DocoPark.BusinessLogic.csproj" />
+    <Project Path="DocoPark.DataAccess/DocoPark.DataAccess.csproj" />
+    <Project Path="DocoPark.Domain/DocoPark.Domain.csproj" />
+    <Project Path="DocoPark1/DocoParkWebApp.csproj" />
+  </Folder>
+</Solution>
