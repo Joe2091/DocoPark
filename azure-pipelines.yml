@@ -19,10 +19,10 @@ stages:
               packageType: "sdk"
               version: "8.x"
 
-          - script: dotnet restore
+          - script: dotnet restore DocoPark1.sln
             displayName: "Restore packages"
 
-          - script: dotnet build --configuration $(buildConfiguration) --no-restore
+          - script: dotnet build DocoPark1.sln --configuration $(buildConfiguration) --no-restore
             displayName: "Build solution"
 
           - script: dotnet publish DocoPark1/DocoParkWebApp.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
