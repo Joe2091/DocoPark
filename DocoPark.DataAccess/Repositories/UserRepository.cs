@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DocoPark.BusinessLogic.Interfaces;
+using DocoPark.Domain.Entities;
 
 namespace DocoPark.DataAccess.Repositories
 {
-    internal class UserRepository
+    public class UserRepository : Repository<User>, IUserRepository
     {
+        public UserRepository(DataContext context) : base(context) { }
     }
 }

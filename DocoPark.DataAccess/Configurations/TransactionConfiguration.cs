@@ -23,7 +23,7 @@ internal class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
         builder.HasOne(t => t.User)
             .WithMany(u => u.Transactions)
             .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(t => t.ParkingSession)
             .WithMany(ps => ps.Transactions)

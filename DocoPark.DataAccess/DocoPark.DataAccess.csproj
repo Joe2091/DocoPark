@@ -17,6 +17,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DocoPark.Domain\DocoPark.Domain.csproj" />
+		<ProjectReference Include="..\DocoPark.BusinessLogic\DocoPark.BusinessLogic.csproj" />
 	</ItemGroup>
 
 </Project>

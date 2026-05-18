@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DocoPark.BusinessLogic.Interfaces;
+using DocoPark.Domain.Entities;
 
-namespace DocoPark.DataAccess.Repositories
+namespace DocoPark.DataAccess.Repositories;
+
+public class ReservationRepository : Repository<Reservation>, IReservationRepository
 {
-    internal class ReservationRepository
-    {
-    }
+    public ReservationRepository(DataContext context) : base(context) { }
 }
