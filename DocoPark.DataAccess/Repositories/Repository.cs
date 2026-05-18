@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using DocoPark.BusinessLogic.Interfaces;
+using DocoPark.BusinessLogic.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace DocoPark.DataAccess.Repositories;

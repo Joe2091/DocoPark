@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace DocoPark.BusinessLogic.Interfaces;
+namespace DocoPark.BusinessLogic.Interfaces.Repositories;
 
 public interface IRepository<T> where T : class
 {

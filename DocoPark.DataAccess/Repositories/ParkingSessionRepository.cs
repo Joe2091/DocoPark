@@ -1,4 +1,4 @@
-﻿using DocoPark.BusinessLogic.Interfaces;
+﻿using DocoPark.BusinessLogic.Interfaces.Repositories;
 using DocoPark.Domain.Entities;
 
 namespace DocoPark.DataAccess.Repositories;

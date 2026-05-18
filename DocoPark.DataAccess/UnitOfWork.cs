@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DocoPark.BusinessLogic.Interfaces;
+using DocoPark.BusinessLogic.Interfaces.Repositories;
 using DocoPark.DataAccess.Repositories;
 
 namespace DocoPark.DataAccess
