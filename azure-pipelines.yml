@@ -47,5 +47,5 @@ stages:
                   inputs:
                     azureSubscription: "AzureServiceConnection"
                     appType: "webAppLinux"
-                    appName: "DocoPark"
+                    appName: "docopark-c6cmh4bkg7fpcqd5"
                     package: "$(Pipeline.Workspace)/drop"
