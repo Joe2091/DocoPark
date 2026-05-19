@@ -38,7 +38,7 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: DeployToAppService
-        environment: "production"
+        environment: "DocoParkProduction"
         strategy:
           runOnce:
             deploy:
