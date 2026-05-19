@@ -49,3 +49,4 @@ stages:
                     appType: "webAppLinux"
                     appName: "DocoPark1"
                     package: "$(Pipeline.Workspace)/drop"
+                    appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionString)"'
