@@ -1,8 +1,9 @@
-using DocoPark.BusinessLogic.Interfaces;
-using DocoPark.BusinessLogic.Interfaces.Repositories;
-using DocoPark.Domain.Entities;
+using DocoPark.BusinessLogic.DTOs.User;
+using DocoPark.BusinessLogic.Interfaces.Services;
+using DocoPark.Domain.Enums;
 using DocoParkWebApp.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace DocoPark.Tests.Controllers;
@@ -10,37 +11,35 @@ namespace DocoPark.Tests.Controllers;
 [TestFixture]
 public class UsersControllerTests
 {
-    private Mock<IUnitOfWork> _mockUnitOfWork;
-    private Mock<IUserRepository> _mockUserRepo;
+    private Mock<IUserService> _mockUserService;
     private UsersController _controller;
 
     [SetUp]
     public void SetUp()
     {
-        _mockUnitOfWork = new Mock<IUnitOfWork>();
-        _mockUserRepo = new Mock<IUserRepository>();
-        _mockUnitOfWork.Setup(u => u.Users).Returns(_mockUserRepo.Object);
-        _controller = new UsersController(_mockUnitOfWork.Object);
+        _mockUserService = new Mock<IUserService>();
+        var logger = new Mock<ILogger<UsersController>>().Object;
+        _controller = new UsersController(_mockUserService.Object, logger);
     }
 
     [Test]
     public async Task GetAll_ReturnsOkResult_WithListOfUsers()
     {
         // Arrange
-        var users = new List<User>
+        var users = new List<UserResponseDto>
         {
             new() { Id = 1, Name = "Alice", Email = "alice@example.com" },
             new() { Id = 2, Name = "Bob", Email = "bob@example.com" }
         };
-        _mockUserRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
+        _mockUserService.Setup(s => s.GetAllUsersAsync()).ReturnsAsync(users);
 
         // Act
-        var result = await _controller.GetAll();
+        var actionResult = await _controller.GetAll();
 
         // Assert
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result;
-        var returnedUsers = okResult.Value as IEnumerable<User>;
+        var okResult = actionResult.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var returnedUsers = okResult!.Value as IEnumerable<UserResponseDto>;
         Assert.That(returnedUsers, Is.Not.Null);
         Assert.That(returnedUsers!.Count(), Is.EqualTo(2));
     }
@@ -49,15 +48,15 @@ public class UsersControllerTests
     public async Task GetAll_ReturnsOkResult_WithEmptyList()
     {
         // Arrange
-        _mockUserRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<User>());
+        _mockUserService.Setup(s => s.GetAllUsersAsync()).ReturnsAsync(new List<UserResponseDto>());
 
         // Act
-        var result = await _controller.GetAll();
+        var actionResult = await _controller.GetAll();
 
         // Assert
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result;
-        var returnedUsers = okResult.Value as IEnumerable<User>;
+        var okResult = actionResult.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var returnedUsers = okResult!.Value as IEnumerable<UserResponseDto>;
         Assert.That(returnedUsers, Is.Not.Null);
         Assert.That(returnedUsers!, Is.Empty);
     }
@@ -66,16 +65,16 @@ public class UsersControllerTests
     public async Task GetById_ReturnsOkResult_WhenUserExists()
     {
         // Arrange
-        var user = new User { Id = 1, Name = "Alice", Email = "alice@example.com" };
-        _mockUserRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(user);
+        var user = new UserResponseDto { Id = 1, Name = "Alice", Email = "alice@example.com" };
+        _mockUserService.Setup(s => s.GetUserByIdAsync(1)).ReturnsAsync(user);
 
         // Act
-        var result = await _controller.GetById(1);
+        var actionResult = await _controller.GetById(1);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<OkObjectResult>());
-        var okResult = (OkObjectResult)result;
-        var returnedUser = okResult.Value as User;
+        var okResult = actionResult.Result as OkObjectResult;
+        Assert.That(okResult, Is.Not.Null);
+        var returnedUser = okResult!.Value as UserResponseDto;
         Assert.That(returnedUser, Is.Not.Null);
         Assert.That(returnedUser!.Name, Is.EqualTo("Alice"));
     }
@@ -84,12 +83,13 @@ public class UsersControllerTests
     public async Task GetById_ReturnsNotFound_WhenUserDoesNotExist()
     {
         // Arrange
-        _mockUserRepo.Setup(r => r.GetByIdAsync(99)).ReturnsAsync((User?)null);
+        _mockUserService.Setup(s => s.GetUserByIdAsync(99)).ReturnsAsync((UserResponseDto?)null);
 
         // Act
-        var result = await _controller.GetById(99);
+        var actionResult = await _controller.GetById(99);
 
         // Assert
-        Assert.That(result, Is.InstanceOf<NotFoundResult>());
+        var notFoundResult = actionResult.Result as NotFoundObjectResult;
+        Assert.That(notFoundResult, Is.Not.Null);
     }
 }
