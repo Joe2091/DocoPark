@@ -47,6 +47,6 @@ stages:
                   inputs:
                     azureSubscription: "docopark"
                     appType: "webAppLinux"
-                    appName: "DocoPark1"
+                    appName: "joedocopark"
                     package: "$(Pipeline.Workspace)/drop"
                     appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionString)"'
