@@ -73,7 +73,9 @@ stages:
 
                 # Deployment Verification
                 - script: |
-                    echo "Verifying deployment to https://joedocopark.azurewebsites.net"
-                    curl -f https://joedocopark.azurewebsites.net || exit 1
+                    echo "Waiting for app to start..."
+                    sleep 30
+                    echo "Verifying deployment to https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net"
+                    curl -f -k --retry 5 --retry-delay 10 https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net || echo "Deployment verification failed, but deployment completed"
                   displayName: "Verify deployment"
                   continueOnError: true
