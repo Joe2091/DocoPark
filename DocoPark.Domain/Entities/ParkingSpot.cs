@@ -6,8 +6,7 @@ namespace DocoPark.Domain.Entities
     {
         public int Id { get; set; }
         public string SpotNumber { get; set; } = string.Empty;
-        public bool IsOccupied { get; set; }
-        public VehicleType VehicleType { get; set; }
+        public SpotStatus SpotStatus { get; set; }
         public int? CurrentSessionId { get; set; }
 
         // Navigation properties
@@ -15,4 +14,4 @@ namespace DocoPark.Domain.Entities
         public ICollection<ParkingSession> ParkingSessions { get; set; } = new List<ParkingSession>();
         public ICollection<Reservation> Reservations { get; set; } = new List<Reservation>();
     }
-}   
+}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DocoPark.Domain.Entities;
+using DocoPark.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,32 +14,21 @@ internal class ParkingSpotConfiguration : IEntityTypeConfiguration<ParkingSpot>
 {
     public void Configure(EntityTypeBuilder<ParkingSpot> builder)
     {
-        builder.HasKey(ps => ps.Id);
+        builder.Property(p => p.SpotNumber).HasMaxLength(10).IsRequired();
+        builder.HasIndex(p => p.SpotNumber).IsUnique();
 
-        builder.Property(ps => ps.SpotNumber)
-            .IsRequired()
-            .HasMaxLength(10);
-
-        builder.HasIndex(ps => ps.SpotNumber)
-            .IsUnique();
-
-        builder.Property(ps => ps.VehicleType)
+        builder.Property(p => p.SpotStatus)
             .HasConversion<string>()
-            .HasMaxLength(30);
+            .HasMaxLength(20);
 
-        builder.HasOne(ps => ps.CurrentSession)
-            .WithOne()
-            .HasForeignKey<ParkingSpot>(ps => ps.CurrentSessionId)
-            .OnDelete(DeleteBehavior.SetNull);
+        // Seed 50 parking spots
+        var spots = Enumerable.Range(1, 50).Select(i => new ParkingSpot
+        {
+            Id = i,
+            SpotNumber = $"S{i:D3}",
+            SpotStatus = SpotStatus.Available
+        }).ToArray();
 
-        builder.HasMany(ps => ps.ParkingSessions)
-            .WithOne(s => s.ParkingSpot)
-            .HasForeignKey(s => s.ParkingSpotId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasMany(ps => ps.Reservations)
-            .WithOne(r => r.ParkingSpot)
-            .HasForeignKey(r => r.ParkingSpotId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasData(spots);
     }
 }
