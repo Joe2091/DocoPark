@@ -8,6 +8,7 @@ pool:
 
 variables:
   buildConfiguration: "Release"
+  dotnetVersion: "9.0.200" # Centralize version
 
 stages:
   - stage: Build
@@ -15,9 +16,10 @@ stages:
       - job: BuildAndTest
         steps:
           - task: UseDotNet@2
+            displayName: "Install .NET SDK"
             inputs:
               packageType: "sdk"
-              version: "9.0.200"
+              version: $(dotnetVersion)
 
           - script: dotnet restore DocoPark1.slnx
             displayName: "Restore packages"
@@ -25,7 +27,18 @@ stages:
           - script: dotnet build DocoPark1.slnx --configuration $(buildConfiguration) --no-restore
             displayName: "Build solution"
 
-          - script: dotnet publish DocoPark1/DocoParkWebApp.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)
+          - script: dotnet test DocoPark1.slnx --configuration $(buildConfiguration) --no-build --logger trx
+            displayName: "Run tests"
+            condition: succeededOrFailed()
+
+          - task: PublishTestResults@2
+            displayName: "Publish test results"
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: "VSTest"
+              testResultsFiles: "**/*.trx"
+
+          - script: dotnet publish DocoPark1/DocoParkWebApp.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build
             displayName: "Publish"
 
           - task: PublishBuildArtifacts@1
@@ -38,15 +51,23 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: DeployToAppService
-        environment: "DocoParkProduction"
+        environment: "DocoParkProduction" # IMPROVEMENT 3: Consider adding manual approval in Azure DevOps
         strategy:
           runOnce:
             deploy:
               steps:
                 - task: AzureWebApp@1
+                  displayName: "Deploy to Azure App Service"
                   inputs:
                     azureSubscription: "docopark"
                     appType: "webAppLinux"
                     appName: "joedocopark"
                     package: "$(Pipeline.Workspace)/drop"
                     appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionString)"'
+
+                # Deployment Verification
+                - script: |
+                    echo "Verifying deployment to https://joedocopark.azurewebsites.net"
+                    curl -f https://joedocopark.azurewebsites.net || exit 1
+                  displayName: "Verify deployment"
+                  continueOnError: true

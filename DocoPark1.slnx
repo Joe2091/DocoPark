@@ -4,5 +4,6 @@
     <Project Path="DocoPark.DataAccess/DocoPark.DataAccess.csproj" />
     <Project Path="DocoPark.Domain/DocoPark.Domain.csproj" />
     <Project Path="DocoPark1/DocoParkWebApp.csproj" />
+    <Project Path="DocoParkWebApp.Integration.UnitTests/DocoParkWebApp.Integration.UnitTests.csproj" Id="47ce1afe-da3e-4799-92d7-20c86ea9f70c" />
   </Folder>
 </Solution>
