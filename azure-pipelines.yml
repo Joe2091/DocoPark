@@ -57,7 +57,7 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: DeployToAppService
-        environment: "DocoParkProduction" # IMPROVEMENT 3: Consider adding manual approval in Azure DevOps
+        environment: "DocoParkProduction"
         strategy:
           runOnce:
             deploy:
