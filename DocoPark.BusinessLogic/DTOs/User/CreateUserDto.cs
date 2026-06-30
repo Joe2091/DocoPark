@@ -3,7 +3,7 @@ using DocoPark.Domain.Enums;
 
 namespace DocoPark.BusinessLogic.DTOs.User;
 
-public class CreateUserDto
+public sealed class CreateUserDto
 {
     [Required]
     [StringLength(100, MinimumLength = 2)]

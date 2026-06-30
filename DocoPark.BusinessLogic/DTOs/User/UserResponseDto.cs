@@ -2,14 +2,14 @@ using DocoPark.Domain.Enums;
 
 namespace DocoPark.BusinessLogic.DTOs.User;
 
-public class UserResponseDto
+public sealed class UserResponseDto
 {
-    public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public string Email { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public SubscriptionType SubscriptionType { get; set; }
-    public bool IsPremium { get; set; }
-    public DateTime CreatedDate { get; set; }
-    public int VehicleCount { get; set; }
+    public int Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+    public string Phone { get; init; } = string.Empty;
+    public SubscriptionType SubscriptionType { get; init; }
+    public bool IsPremium { get; init; }
+    public DateTime CreatedDate { get; init; }
+    public int VehicleCount { get; init; }
 }
