@@ -12,6 +12,8 @@ builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(build
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
+builder.Services.AddScoped<IPricingService, PricingService>();
+builder.Services.AddScoped<IParkingSessionService, ParkingSessionService>();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
@@ -33,6 +35,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-app.MapGet("/", () => "DocoPark API is running! 🚗");
+app.MapGet("/", () => "DocoPark API is running!");
 
 app.Run();
