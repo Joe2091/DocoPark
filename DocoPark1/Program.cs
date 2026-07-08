@@ -1,19 +1,13 @@
-using DocoPark.BusinessLogic.Interfaces;
-using DocoPark.BusinessLogic.Interfaces.Services;
 using DocoPark.BusinessLogic.Mappings;
-using DocoPark.BusinessLogic.Services;
 using DocoPark.DataAccess;
+using DocoParkWebApp.Extensions;
 using DocoParkWebApp.Middleware;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IVehicleService, VehicleService>();
-builder.Services.AddScoped<IPricingService, PricingService>();
-builder.Services.AddScoped<IParkingSessionService, ParkingSessionService>();
+builder.Services.AddApplicationServices();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
