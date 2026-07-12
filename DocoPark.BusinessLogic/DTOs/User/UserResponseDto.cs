@@ -2,7 +2,7 @@ using DocoPark.Domain.Enums;
 
 namespace DocoPark.BusinessLogic.DTOs.User;
 
-public sealed class UserResponseDto
+public sealed record UserResponseDto
 {
     public int Id { get; init; }
     public string Name { get; init; } = string.Empty;

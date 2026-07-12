@@ -1,13 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DocoPark.BusinessLogic.DTOs.Reservation
 {
     public sealed class CreateReservationDto
     {
-    public Guid Id { get; set; }
+        [Required]
+        public int UserId { get; set; }
+        [Required]
+        public int ParkingSpotId { get; set; }
+        [Required]
+        public int VehicleId { get; set; }
+        [Required]
+        public DateTime ReservedFrom { get; set; }
+        [Required]
+        public DateTime ReservedTo { get; set; }
+
     }
 }

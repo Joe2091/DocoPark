@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DocoPark.BusinessLogic.DTOs.Reservation;
 
 namespace DocoPark.BusinessLogic.Interfaces.Services
+    
 {
-    internal interface IReservationService
+    public interface IReservationService
     {
+        Task<ReservationResponseDto> CreateReservationAsync(CreateReservationDto dto);
+        Task<ReservationResponseDto?> GetReservationsByIdAsync(int id);
+        Task<IEnumerable<ReservationResponseDto>> GetActiveReservationsAsync();
+        Task<IEnumerable<ReservationResponseDto?>> GetReservationByUserIdAsync(int userId);
+        Task<bool> CancelReservationAsync(int id);
     }
 }

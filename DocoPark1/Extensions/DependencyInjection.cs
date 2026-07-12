@@ -15,6 +15,7 @@ namespace DocoParkWebApp.Extensions
             services.AddScoped<IVehicleService, VehicleService>();
             services.AddScoped<IPricingService, PricingService>();
             services.AddScoped<IParkingSessionService, ParkingSessionService>();
+            services.AddScoped<IReservationService, ReservationService>();
             services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
             return services;

@@ -2,7 +2,7 @@ using DocoPark.Domain.Enums;
 
 namespace DocoPark.BusinessLogic.DTOs.ParkingSession;
 
-public sealed class ParkingSessionResponseDto
+public sealed record ParkingSessionResponseDto
 {
     public int Id { get; init; }
     public string LicensePlate { get; init; } = string.Empty;
