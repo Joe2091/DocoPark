@@ -14,7 +14,7 @@ public class UsersController : ControllerBase
     public UsersController(IUserService userService, ILogger<UsersController> logger)
     {
         this.userService = userService;
-       this.logger = logger;
+        this.logger = logger;
     }
 
     /// <summary>

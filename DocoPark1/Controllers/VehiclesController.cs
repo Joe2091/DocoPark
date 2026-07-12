@@ -13,8 +13,8 @@ public sealed class VehiclesController : ControllerBase
 
     public VehiclesController(IVehicleService vehicleService, ILogger<VehiclesController> logger)
     {
-        vehicleService = vehicleService;
-        logger = logger;
+        this.vehicleService = vehicleService;
+        this.logger = logger;
     }
 
     [HttpGet]

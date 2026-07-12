@@ -13,8 +13,8 @@ public sealed class ReservationsController : ControllerBase
 
     public ReservationsController(IReservationService reservationService, ILogger<ReservationsController> logger)
     {
-        reservationService = reservationService;
-        logger = logger;
+        this.reservationService = reservationService;
+        this.logger = logger;
     }
 
     /// <summary>

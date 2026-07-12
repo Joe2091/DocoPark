@@ -13,8 +13,8 @@ public sealed class ParkingController : ControllerBase
 
     public ParkingController(IParkingSessionService parkingSessionService, ILogger<ParkingController> logger)
     {
-        parkingSessionService = parkingSessionService;
-        logger = logger;
+        this.parkingSessionService = parkingSessionService;
+        this.logger = logger;
     }
 
     /// <summary>
