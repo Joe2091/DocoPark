@@ -8,21 +8,21 @@ namespace DocoParkWebApp.Controllers;
 [Route("api/[controller]")]
 public sealed class VehiclesController : ControllerBase
 {
-    private readonly IVehicleService _vehicleService;
-    private readonly ILogger<VehiclesController> _logger;
+    private readonly IVehicleService vehicleService;
+    private readonly ILogger<VehiclesController> logger;
 
     public VehiclesController(IVehicleService vehicleService, ILogger<VehiclesController> logger)
     {
-        _vehicleService = vehicleService;
-        _logger = logger;
+        vehicleService = vehicleService;
+        logger = logger;
     }
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<VehicleResponseDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<VehicleResponseDto>>> GetAll()
     {
-        _logger.LogInformation("Retrieving all vehicles.");
-        var vehicles = await _vehicleService.GetAllVehiclesAsync();
+        logger.LogInformation("Retrieving all vehicles.");
+        var vehicles = await vehicleService.GetAllVehiclesAsync();
         return Ok(vehicles);
     }
 
@@ -31,11 +31,11 @@ public sealed class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<VehicleResponseDto>> GetById(int id)
     {
-        _logger.LogInformation("Retrieving vehicle with ID {VehicleId}.", id);
-        var vehicle = await _vehicleService.GetVehicleByIdAsync(id);
+        logger.LogInformation("Retrieving vehicle with ID {VehicleId}.", id);
+        var vehicle = await vehicleService.GetVehicleByIdAsync(id);
         if (vehicle is null)
         {
-            _logger.LogWarning("Vehicle with ID {VehicleId} not found.", id);
+            logger.LogWarning("Vehicle with ID {VehicleId} not found.", id);
             return NotFound(new { message = $"Vehicle with ID {id} not found." });
         }
 
@@ -46,8 +46,8 @@ public sealed class VehiclesController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<VehicleResponseDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<VehicleResponseDto>>> GetByUserId(int userId)
     {
-        _logger.LogInformation("Retrieving vehicles for user {UserId}.", userId);
-        var vehicles = await _vehicleService.GetVehiclesByUserIdAsync(userId);
+        logger.LogInformation("Retrieving vehicles for user {UserId}.", userId);
+        var vehicles = await vehicleService.GetVehiclesByUserIdAsync(userId);
         return Ok(vehicles);
     }
 
@@ -56,11 +56,11 @@ public sealed class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<VehicleResponseDto>> GetByLicensePlate(string licensePlate)
     {
-        _logger.LogInformation("Retrieving vehicle with plate {LicensePlate}.", licensePlate);
-        var vehicle = await _vehicleService.GetVehicleByLicensePlateAsync(licensePlate);
+        logger.LogInformation("Retrieving vehicle with plate {LicensePlate}.", licensePlate);
+        var vehicle = await vehicleService.GetVehicleByLicensePlateAsync(licensePlate);
         if (vehicle is null)
         {
-            _logger.LogWarning("Vehicle with plate {LicensePlate} not found.", licensePlate);
+            logger.LogWarning("Vehicle with plate {LicensePlate} not found.", licensePlate);
             return NotFound(new { message = $"Vehicle with plate '{licensePlate}' not found." });
         }
 
@@ -74,13 +74,13 @@ public sealed class VehiclesController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Create vehicle failed due to invalid model state.");
+            logger.LogWarning("Create vehicle failed due to invalid model state.");
             return BadRequest(ModelState);
         }
 
-        _logger.LogInformation("Creating vehicle with plate {LicensePlate}.", dto.LicensePlate);
-        var vehicle = await _vehicleService.CreateVehicleAsync(dto);
-        _logger.LogInformation("Vehicle created with ID {VehicleId}.", vehicle.Id);
+        logger.LogInformation("Creating vehicle with plate {LicensePlate}.", dto.LicensePlate);
+        var vehicle = await vehicleService.CreateVehicleAsync(dto);
+        logger.LogInformation("Vehicle created with ID {VehicleId}.", vehicle.Id);
         return CreatedAtAction(nameof(GetById), new { id = vehicle.Id }, vehicle);
     }
 
@@ -92,19 +92,19 @@ public sealed class VehiclesController : ControllerBase
     {
         if (!ModelState.IsValid)
         {
-            _logger.LogWarning("Update vehicle {VehicleId} failed due to invalid model state.", id);
+            logger.LogWarning("Update vehicle {VehicleId} failed due to invalid model state.", id);
             return BadRequest(ModelState);
         }
 
-        _logger.LogInformation("Updating vehicle with ID {VehicleId}.", id);
-        var vehicle = await _vehicleService.UpdateVehicleAsync(id, dto);
+        logger.LogInformation("Updating vehicle with ID {VehicleId}.", id);
+        var vehicle = await vehicleService.UpdateVehicleAsync(id, dto);
         if (vehicle is null)
         {
-            _logger.LogWarning("Update failed. Vehicle with ID {VehicleId} not found.", id);
+            logger.LogWarning("Update failed. Vehicle with ID {VehicleId} not found.", id);
             return NotFound(new { message = $"Vehicle with ID {id} not found." });
         }
 
-        _logger.LogInformation("Vehicle {VehicleId} updated successfully.", id);
+        logger.LogInformation("Vehicle {VehicleId} updated successfully.", id);
         return Ok(vehicle);
     }
 
@@ -113,15 +113,15 @@ public sealed class VehiclesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(int id)
     {
-        _logger.LogInformation("Deleting vehicle with ID {VehicleId}.", id);
-        var deleted = await _vehicleService.DeleteVehicleAsync(id);
+        logger.LogInformation("Deleting vehicle with ID {VehicleId}.", id);
+        var deleted = await vehicleService.DeleteVehicleAsync(id);
         if (!deleted)
         {
-            _logger.LogWarning("Delete failed. Vehicle with ID {VehicleId} not found.", id);
+            logger.LogWarning("Delete failed. Vehicle with ID {VehicleId} not found.", id);
             return NotFound(new { message = $"Vehicle with ID {id} not found." });
         }
 
-        _logger.LogInformation("Vehicle {VehicleId} deleted successfully.", id);
+        logger.LogInformation("Vehicle {VehicleId} deleted successfully.", id);
         return NoContent();
     }
 }

@@ -8,13 +8,13 @@ namespace DocoParkWebApp.Controllers;
 [Route("api/[controller]")]
 public sealed class ParkingController : ControllerBase
 {
-    private readonly IParkingSessionService _parkingSessionService;
-    private readonly ILogger<ParkingController> _logger;
+    private readonly IParkingSessionService parkingSessionService;
+    private readonly ILogger<ParkingController> logger;
 
     public ParkingController(IParkingSessionService parkingSessionService, ILogger<ParkingController> logger)
     {
-        _parkingSessionService = parkingSessionService;
-        _logger = logger;
+        parkingSessionService = parkingSessionService;
+        logger = logger;
     }
 
     /// <summary>
@@ -30,9 +30,9 @@ public sealed class ParkingController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        _logger.LogInformation("Check-in requested for vehicle {LicensePlate}.", dto.LicensePlate);
-        var session = await _parkingSessionService.CheckInAsync(dto);
-        _logger.LogInformation("Vehicle {LicensePlate} checked in to spot {SpotNumber}.", dto.LicensePlate, session.SpotNumber);
+        logger.LogInformation("Check-in requested for vehicle {LicensePlate}.", dto.LicensePlate);
+        var session = await parkingSessionService.CheckInAsync(dto);
+        logger.LogInformation("Vehicle {LicensePlate} checked in to spot {SpotNumber}.", dto.LicensePlate, session.SpotNumber);
 
         return CreatedAtAction(nameof(GetById), new { id = session.Id }, session);
     }
@@ -48,9 +48,9 @@ public sealed class ParkingController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        _logger.LogInformation("Check-out requested for vehicle {LicensePlate}.", dto.LicensePlate);
-        var session = await _parkingSessionService.CheckOutAsync(dto);
-        _logger.LogInformation("Vehicle {LicensePlate} checked out. Charge: €{Cost}.", dto.LicensePlate, session.TotalCost);
+        logger.LogInformation("Check-out requested for vehicle {LicensePlate}.", dto.LicensePlate);
+        var session = await parkingSessionService.CheckOutAsync(dto);
+        logger.LogInformation("Vehicle {LicensePlate} checked out. Charge: €{Cost}.", dto.LicensePlate, session.TotalCost);
 
         return Ok(session);
     }
@@ -62,8 +62,8 @@ public sealed class ParkingController : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<ParkingSessionResponseDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<ParkingSessionResponseDto>>> GetActiveSessions()
     {
-        _logger.LogInformation("Retrieving all active parking sessions.");
-        var sessions = await _parkingSessionService.GetActiveSessionsAsync();
+        logger.LogInformation("Retrieving all active parking sessions.");
+        var sessions = await parkingSessionService.GetActiveSessionsAsync();
         return Ok(sessions);
     }
 
@@ -75,7 +75,7 @@ public sealed class ParkingController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ParkingSessionResponseDto>> GetById(int id)
     {
-        var session = await _parkingSessionService.GetSessionByIdAsync(id);
+        var session = await parkingSessionService.GetSessionByIdAsync(id);
         if (session is null)
             return NotFound(new { message = $"Session with ID {id} not found." });
 
