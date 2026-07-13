@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DocoPark.BusinessLogic.DTOs.Subscription;
 
-namespace DocoPark.BusinessLogic.Interfaces.Services
+namespace DocoPark.BusinessLogic.Interfaces.Services;
+
+public interface ISubscriptionService
 {
-    internal interface ISubscriptionService
-    {
-    }
+    Task<SubscriptionResponseDto> CreateSubscriptionAsync(CreateSubscriptionDto dto);
+    Task<SubscriptionResponseDto?> GetSubscriptionByIdAsync(int id);
+    Task<IEnumerable<SubscriptionResponseDto>> GetSubscriptionsByUserIdAsync(int userId);
+    Task<IEnumerable<SubscriptionResponseDto>> GetActiveSubscriptionsAsync();
+    Task<bool> CancelSubscriptionAsync(int id);
 }
