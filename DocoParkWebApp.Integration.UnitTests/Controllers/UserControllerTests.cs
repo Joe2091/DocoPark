@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace DocoPark.Tests.Controllers;
+namespace DocoParkWebApp.Integration.UnitTests.Controllers;
 
 [TestFixture]
 public class UsersControllerTests

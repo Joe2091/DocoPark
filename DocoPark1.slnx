@@ -5,7 +5,7 @@
     <Project Path="DocoPark.Domain/DocoPark.Domain.csproj" />
     <Project Path="DocoPark1/DocoParkWebApp.csproj" />
   </Folder>
-  <Folder Name="/src/tests/">
+  <Folder Name="/tests/">
     <Project Path="DocoPark.BusinessLogic.UnitTests/DocoPark.BusinessLogic.UnitTests.csproj" Id="8be906f5-317b-4da9-8458-c84e26c9dfe5" />
     <Project Path="DocoPark.DataAccess.UnitTests/DocoPark.DataAccess.UnitTests.csproj" Id="42f620c1-dc20-48ed-9313-8c16a853885e" />
     <Project Path="DocoPark.Domain.UnitTests/DocoPark.Domain.UnitTests.csproj" Id="03d0da9e-117b-4ab7-8852-63c3291af040" />
