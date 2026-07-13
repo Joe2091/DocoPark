@@ -6,4 +6,9 @@ public static class MiddlewareExtensions
     {
         return app.UseMiddleware<GlobalExceptionMiddleware>();
     }
+
+    public static IApplicationBuilder UseApiKeyAuthentication(this IApplicationBuilder app)
+    {
+        return app.UseMiddleware<ApiKeyMiddleware>();
+    }
 }

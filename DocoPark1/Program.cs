@@ -13,11 +13,35 @@ builder.Services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Name = "X-Api-Key",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        Description = "Enter your API key"
+    });
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
 app.UseGlobalExceptionHandling();
+app.UseApiKeyAuthentication();
 
 if (app.Environment.IsDevelopment())
 {
