@@ -21,6 +21,12 @@ internal class ParkingSpotConfiguration : IEntityTypeConfiguration<ParkingSpot>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        // Configure the one-to-one relationship for CurrentSession
+        builder.HasOne(p => p.CurrentSession)
+            .WithOne()
+            .HasForeignKey<ParkingSpot>(p => p.CurrentSessionId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         // Seed 50 parking spots
         var spots = Enumerable.Range(1, 50).Select(i => new ParkingSpot
         {
