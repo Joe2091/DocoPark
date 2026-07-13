@@ -12,6 +12,15 @@ builder.Services.AddApplicationServices();
 builder.Services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
 
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+        policy.WithOrigins("http://localhost:5175")
+              .AllowAnyMethod()
+              .AllowAnyHeader());
+});
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -41,6 +50,10 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 app.UseGlobalExceptionHandling();
+
+// Use CORS - MUST be before UseApiKeyAuthentication and other middleware
+app.UseCors("AllowFrontend");
+
 app.UseApiKeyAuthentication();
 
 if (app.Environment.IsDevelopment())
