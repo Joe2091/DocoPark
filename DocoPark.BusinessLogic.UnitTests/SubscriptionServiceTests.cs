@@ -12,7 +12,7 @@ using System.Timers;
 namespace DocoPark.BusinessLogic.UnitTests;
 
 [TestFixture]
-public sealed class SubscriptionServiceTests
+public class SubscriptionServiceTests
 {
     private Mock<IUnitOfWork> _mockUnitOfWork;
     private Mock<IUserRepository> _mockUserRepo;

@@ -11,7 +11,7 @@ using System.Timers;
 namespace DocoPark.BusinessLogic.UnitTests;
 
 [TestFixture]
-public sealed class ReservationServiceTests
+public class ReservationServiceTests
 {
     private Mock<IUnitOfWork> _mockUnitOfWork;
     private Mock<IUserRepository> _mockUserRepo;

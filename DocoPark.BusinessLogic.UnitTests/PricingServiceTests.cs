@@ -4,7 +4,7 @@ using DocoPark.Domain.Enums;
 namespace DocoPark.BusinessLogic.UnitTests;
 
 [TestFixture]
-public sealed class PricingServiceTests
+public class PricingServiceTests
 {
     private PricingService _pricingService;
 

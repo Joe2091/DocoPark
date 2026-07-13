@@ -11,7 +11,7 @@ using Moq;
 namespace DocoPark.BusinessLogic.UnitTests;
 
 [TestFixture]
-public sealed class UserServiceTests
+public class UserServiceTests
 {
     private Mock<IUnitOfWork> _mockUnitOfWork;
     private Mock<IUserRepository> _mockUserRepo;
