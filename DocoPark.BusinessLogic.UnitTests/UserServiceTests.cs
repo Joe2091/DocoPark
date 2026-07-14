@@ -15,6 +15,7 @@ public class UserServiceTests
 {
     private Mock<IUnitOfWork> _mockUnitOfWork;
     private Mock<IUserRepository> _mockUserRepo;
+    private Mock<IVehicleRepository> _mockVehicleRepo;  // Add this
     private Mock<IMapper> _mockMapper;
     private UserService _service;
 
@@ -23,9 +24,11 @@ public class UserServiceTests
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockUserRepo = new Mock<IUserRepository>();
+        _mockVehicleRepo = new Mock<IVehicleRepository>();  // Add this
         _mockMapper = new Mock<IMapper>();
 
         _mockUnitOfWork.Setup(u => u.Users).Returns(_mockUserRepo.Object);
+        _mockUnitOfWork.Setup(u => u.Vehicles).Returns(_mockVehicleRepo.Object);  // Add this
 
         _service = new UserService(_mockUnitOfWork.Object, _mockMapper.Object);
     }
@@ -38,34 +41,38 @@ public class UserServiceTests
             new() { Id = 1, Name = "Joe" },
             new() { Id = 2, Name = "Jane" }
         };
-        var expectedDtos = new List<UserResponseDto>
-        {
-            new() { Id = 1, Name = "Joe" },
-            new() { Id = 2, Name = "Jane" }
-        };
+        var vehicles = new List<Vehicle>();  // Empty list for vehicle count
 
         _mockUserRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(users);
-        _mockMapper.Setup(m => m.Map<IEnumerable<UserResponseDto>>(users)).Returns(expectedDtos);
+        _mockVehicleRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Vehicle, bool>>>()))
+            .ReturnsAsync(vehicles);  // Add this mock
 
         var result = (await _service.GetAllUsersAsync()).ToList();
 
         Assert.That(result, Has.Count.EqualTo(2));
         Assert.That(result[0].Name, Is.EqualTo("Joe"));
+        Assert.That(result[0].VehicleCount, Is.EqualTo(0));
     }
 
     [Test]
     public async Task GetUserByIdAsync_Exists_ReturnsUser()
     {
         var user = new User { Id = 1, Name = "Joe", Email = "joe@test.com" };
-        var dto = new UserResponseDto { Id = 1, Name = "Joe", Email = "joe@test.com" };
+        var vehicles = new List<Vehicle> 
+        { 
+            new() { Id = 1, UserId = 1 },
+            new() { Id = 2, UserId = 1 }
+        };
 
         _mockUserRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(user);
-        _mockMapper.Setup(m => m.Map<UserResponseDto>(user)).Returns(dto);
+        _mockVehicleRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Vehicle, bool>>>()))
+            .ReturnsAsync(vehicles);  // Add this mock
 
         var result = await _service.GetUserByIdAsync(1);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Name, Is.EqualTo("Joe"));
+        Assert.That(result.VehicleCount, Is.EqualTo(2));
     }
 
     [Test]
@@ -101,16 +108,28 @@ public class UserServiceTests
     {
         var user = new User { Id = 1, Name = "Joe", Email = "joe@test.com" };
         var updateDto = new UpdateUserDto { Name = "Joseph", Email = "joseph@test.com", Phone = "999" };
-        var responseDto = new UserResponseDto { Id = 1, Name = "Joseph", Email = "joseph@test.com" };
+        var vehicles = new List<Vehicle> { new() { Id = 1, UserId = 1 } };
 
         _mockUserRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(user);
-        _mockMapper.Setup(m => m.Map(updateDto, user));
-        _mockMapper.Setup(m => m.Map<UserResponseDto>(user)).Returns(responseDto);
+        
+        // Use Callback to simulate AutoMapper updating the user object
+        _mockMapper.Setup(m => m.Map(updateDto, user))
+            .Callback<UpdateUserDto, User>((dto, u) =>
+            {
+                u.Name = dto.Name;
+                u.Email = dto.Email;
+                u.Phone = dto.Phone;
+            });
+    
+        _mockVehicleRepo.Setup(r => r.FindAsync(It.IsAny<Expression<Func<Vehicle, bool>>>()))
+            .ReturnsAsync(vehicles);
 
         var result = await _service.UpdateUserAsync(1, updateDto);
 
         Assert.That(result, Is.Not.Null);
         Assert.That(result!.Name, Is.EqualTo("Joseph"));
+        Assert.That(result.Email, Is.EqualTo("joseph@test.com"));
+        Assert.That(result.VehicleCount, Is.EqualTo(1));
         _mockUnitOfWork.Verify(u => u.SaveChangesAsync(), Times.Once);
     }
 

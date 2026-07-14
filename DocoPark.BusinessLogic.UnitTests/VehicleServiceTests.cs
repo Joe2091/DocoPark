@@ -15,6 +15,7 @@ public class VehicleServiceTests
 {
     private Mock<IUnitOfWork> _mockUnitOfWork;
     private Mock<IVehicleRepository> _mockVehicleRepo;
+    private Mock<IUserRepository> _mockUserRepo;  
     private Mock<IMapper> _mockMapper;
     private VehicleService _service;
 
@@ -23,9 +24,11 @@ public class VehicleServiceTests
     {
         _mockUnitOfWork = new Mock<IUnitOfWork>();
         _mockVehicleRepo = new Mock<IVehicleRepository>();
+        _mockUserRepo = new Mock<IUserRepository>();  
         _mockMapper = new Mock<IMapper>();
 
         _mockUnitOfWork.Setup(u => u.Vehicles).Returns(_mockVehicleRepo.Object);
+        _mockUnitOfWork.Setup(u => u.Users).Returns(_mockUserRepo.Object);  
 
         _service = new VehicleService(_mockUnitOfWork.Object, _mockMapper.Object);
     }
