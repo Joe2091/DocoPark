@@ -8,7 +8,6 @@ pool:
 
 variables:
   buildConfiguration: "Release"
-  dotnetVersion: "9.0.200" # Centralize version
 
 stages:
   - stage: Build
@@ -20,12 +19,6 @@ stages:
             inputs:
               packageType: "sdk"
               version: "8.x"
-
-          - task: UseDotNet@2
-            displayName: "Install .NET 9 SDK"
-            inputs:
-              packageType: "sdk"
-              version: $(dotnetVersion)
 
           - script: dotnet restore DocoPark1.slnx
             displayName: "Restore packages"
@@ -44,8 +37,14 @@ stages:
               testResultsFormat: "VSTest"
               testResultsFiles: "**/*.trx"
 
-          - script: dotnet publish DocoPark1/DocoParkWebApp.csproj --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) --no-build
+          - task: DotNetCoreCLI@2
             displayName: "Publish"
+            inputs:
+              command: "publish"
+              publishWebProjects: false
+              projects: "DocoPark1/DocoPark1.csproj"
+              arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)"
+              zipAfterPublish: true
 
           - task: PublishBuildArtifacts@1
             inputs:
@@ -68,14 +67,11 @@ stages:
                     azureSubscription: "docopark"
                     appType: "webAppLinux"
                     appName: "joedocopark"
-                    package: "$(Pipeline.Workspace)/drop"
-                    appSettings: '-ConnectionStrings__DefaultConnection "$(ConnectionString)"'
+                    package: "$(Pipeline.Workspace)/drop/*.zip"
 
-                # Deployment Verification
                 - script: |
                     echo "Waiting for app to start..."
                     sleep 30
-                    echo "Verifying deployment to https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net"
-                    curl -f -k --retry 5 --retry-delay 10 https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net || echo "Deployment verification failed, but deployment completed"
+                    curl -f -k --retry 5 --retry-delay 10 https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net || echo "Verification failed"
                   displayName: "Verify deployment"
                   continueOnError: true
