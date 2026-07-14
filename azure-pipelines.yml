@@ -14,14 +14,12 @@ stages:
     jobs:
       - job: BuildAndTest
         steps:
-          # Install .NET 9 SDK (required for .slnx support)
           - task: UseDotNet@2
             displayName: "Install .NET 9 SDK"
             inputs:
               packageType: "sdk"
               version: "9.x"
 
-          # Also install .NET 8 runtime (your app targets .NET 8)
           - task: UseDotNet@2
             displayName: "Install .NET 8 SDK"
             inputs:
@@ -50,7 +48,7 @@ stages:
             inputs:
               command: "publish"
               publishWebProjects: false
-              projects: "DocoPark1/DocoPark1.csproj"
+              projects: "DocoPark1/DocoParkWebApp.csproj"
               arguments: "--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)"
               zipAfterPublish: true
 
@@ -78,7 +76,7 @@ stages:
                     package: "$(Pipeline.Workspace)/drop/*.zip"
 
                 - script: |
-                    echo "Waiting for app to start..."
+                    echo "Verifying deployment..."
                     sleep 30
                     curl -f -k --retry 5 --retry-delay 10 https://joedocopark-abbucqckefafahey.belgiumcentral-01.azurewebsites.net || echo "Verification failed"
                   displayName: "Verify deployment"
