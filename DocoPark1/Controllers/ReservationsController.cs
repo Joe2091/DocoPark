@@ -98,4 +98,16 @@ public sealed class ReservationsController : ControllerBase
         logger.LogInformation("Reservation {ReservationId} cancelled successfully.", id);
         return NoContent();
     }
+
+    /// <summary>
+    /// Get all reservations.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<ReservationResponseDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<ReservationResponseDto>>> GetAll()
+    {
+        logger.LogInformation("Retrieving all reservations.");
+        var reservations = await reservationService.GetAllReservationsAsync();
+        return Ok(reservations);
+    }
 }

@@ -80,6 +80,18 @@ public sealed class SubscriptionsController : ControllerBase
     }
 
     /// <summary>
+    /// Get all subscriptions.
+    /// </summary>
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<SubscriptionResponseDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<SubscriptionResponseDto>>> GetAll()
+    {
+        logger.LogInformation("Retrieving all subscriptions.");
+        var subscriptions = await subscriptionService.GetAllSubscriptionsAsync();
+        return Ok(subscriptions);
+    }
+
+    /// <summary>
     /// Cancel a subscription.
     /// </summary>
     [HttpPost("{id:int}/cancel")]
@@ -96,6 +108,26 @@ public sealed class SubscriptionsController : ControllerBase
         }
 
         logger.LogInformation("Subscription {SubscriptionId} cancelled successfully.", id);
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete a subscription.
+    /// </summary>
+    [HttpDelete("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Delete(int id)
+    {
+        logger.LogInformation("Deleting subscription {SubscriptionId}.", id);
+        var deleted = await subscriptionService.DeleteSubscriptionAsync(id);
+        if (!deleted)
+        {
+            logger.LogWarning("Delete failed. Subscription with ID {SubscriptionId} not found.", id);
+            return NotFound(new { message = $"Subscription with ID {id} not found." });
+        }
+
+        logger.LogInformation("Subscription {SubscriptionId} deleted successfully.", id);
         return NoContent();
     }
 }

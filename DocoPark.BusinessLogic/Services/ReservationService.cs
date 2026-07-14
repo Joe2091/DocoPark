@@ -142,5 +142,24 @@ namespace DocoPark.BusinessLogic.Services
                 SpotNumber = spotNumber
             };
         }
+
+        public async Task<IEnumerable<ReservationResponseDto>> GetAllReservationsAsync()
+        {
+            var allReservations = await unitofWork.Reservations.GetAllAsync();
+            var results = new List<ReservationResponseDto>();
+
+            foreach (var reservation in allReservations)
+            {
+                var vehicles = await unitofWork.Vehicles.FindAsync(v => v.Id == reservation.VehicleId);
+                var vehicle = vehicles.First();
+
+                var spots = await unitofWork.ParkingSpots.FindAsync(p => p.Id == reservation.ParkingSpotId);
+                var spot = spots.First();
+
+                results.Add(MapToResponse(reservation, vehicle.LicensePlate, spot.SpotNumber));
+            }
+
+            return results;
+        }
     }
 }

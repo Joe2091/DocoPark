@@ -8,73 +8,156 @@ namespace DocoPark.BusinessLogic.Services;
 
 public sealed class VehicleService : IVehicleService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IMapper mapper;
 
     public VehicleService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
+        this.unitOfWork = unitOfWork;
+        this.mapper = mapper;
     }
 
     public async Task<IEnumerable<VehicleResponseDto>> GetAllVehiclesAsync()
     {
-        var vehicles = await _unitOfWork.Vehicles.GetAllAsync();
-        return _mapper.Map<IEnumerable<VehicleResponseDto>>(vehicles);
+        var vehicles = await unitOfWork.Vehicles.GetAllAsync();
+        var results = new List<VehicleResponseDto>();
+
+        foreach (var vehicle in vehicles)
+        {
+            string? ownerName = null;
+            if (vehicle.UserId.HasValue)
+            {
+                var users = await unitOfWork.Users.FindAsync(u => u.Id == vehicle.UserId);
+                ownerName = users.FirstOrDefault()?.Name;
+            }
+
+            results.Add(new VehicleResponseDto
+            {
+                Id = vehicle.Id,
+                LicensePlate = vehicle.LicensePlate,
+                Color = vehicle.Color,
+                VehicleType = vehicle.VehicleType,
+                UserId = vehicle.UserId,
+                OwnerName = ownerName
+            });
+        }
+
+        return results;
     }
 
     public async Task<VehicleResponseDto?> GetVehicleByIdAsync(int id)
     {
-        var vehicle = await _unitOfWork.Vehicles.GetByIdAsync(id);
-        return vehicle is null ? null : _mapper.Map<VehicleResponseDto>(vehicle);
+        var vehicle = await unitOfWork.Vehicles.GetByIdAsync(id);
+        if (vehicle is null) return null;
+
+        string? ownerName = null;
+        if (vehicle.UserId.HasValue)
+        {
+            var users = await unitOfWork.Users.FindAsync(u => u.Id == vehicle.UserId);
+            ownerName = users.FirstOrDefault()?.Name;
+        }
+
+        return new VehicleResponseDto
+        {
+            Id = vehicle.Id,
+            LicensePlate = vehicle.LicensePlate,
+            Color = vehicle.Color,
+            VehicleType = vehicle.VehicleType,
+            UserId = vehicle.UserId,
+            OwnerName = ownerName
+        };
     }
 
     public async Task<IEnumerable<VehicleResponseDto>> GetVehiclesByUserIdAsync(int userId)
     {
-        var vehicles = await _unitOfWork.Vehicles.FindAsync(v => v.UserId == userId);
-        return _mapper.Map<IEnumerable<VehicleResponseDto>>(vehicles);
-    }
+        var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.UserId == userId);
+        var users = await unitOfWork.Users.FindAsync(u => u.Id == userId);
+        var ownerName = users.FirstOrDefault()?.Name;
 
-    public async Task<VehicleResponseDto?> GetVehicleByLicensePlateAsync(string licensePlate)
-    {
-        var vehicles = await _unitOfWork.Vehicles.FindAsync(v => v.LicensePlate == licensePlate);
-        var vehicle = vehicles.FirstOrDefault();
-        return vehicle is null ? null : _mapper.Map<VehicleResponseDto>(vehicle);
+        return vehicles.Select(vehicle => new VehicleResponseDto
+        {
+            Id = vehicle.Id,
+            LicensePlate = vehicle.LicensePlate,
+            Color = vehicle.Color,
+            VehicleType = vehicle.VehicleType,
+            UserId = vehicle.UserId,
+            OwnerName = ownerName
+        });
     }
 
     public async Task<VehicleResponseDto> CreateVehicleAsync(CreateVehicleDto dto)
     {
-        var vehicle = _mapper.Map<Vehicle>(dto);
+        var vehicle = mapper.Map<Vehicle>(dto);
 
-        await _unitOfWork.Vehicles.AddAsync(vehicle);
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.Vehicles.AddAsync(vehicle);
+        await unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<VehicleResponseDto>(vehicle);
+        string? ownerName = null;
+        if (vehicle.UserId.HasValue)
+        {
+            var users = await unitOfWork.Users.FindAsync(u => u.Id == vehicle.UserId);
+            ownerName = users.FirstOrDefault()?.Name;
+        }
+
+        return new VehicleResponseDto
+        {
+            Id = vehicle.Id,
+            LicensePlate = vehicle.LicensePlate,
+            Color = vehicle.Color,
+            VehicleType = vehicle.VehicleType,
+            UserId = vehicle.UserId,
+            OwnerName = ownerName
+        };
     }
 
     public async Task<VehicleResponseDto?> UpdateVehicleAsync(int id, UpdateVehicleDto dto)
     {
-        var vehicle = await _unitOfWork.Vehicles.GetByIdAsync(id);
+        var vehicle = await unitOfWork.Vehicles.GetByIdAsync(id);
         if (vehicle is null)
             return null;
 
-        _mapper.Map(dto, vehicle);
+        mapper.Map(dto, vehicle);
 
-        _unitOfWork.Vehicles.Update(vehicle);
-        await _unitOfWork.SaveChangesAsync();
+        unitOfWork.Vehicles.Update(vehicle);
+        await unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<VehicleResponseDto>(vehicle);
+        return mapper.Map<VehicleResponseDto>(vehicle);
     }
 
     public async Task<bool> DeleteVehicleAsync(int id)
     {
-        var vehicle = await _unitOfWork.Vehicles.GetByIdAsync(id);
+        var vehicle = await unitOfWork.Vehicles.GetByIdAsync(id);
         if (vehicle is null)
             return false;
 
-        _unitOfWork.Vehicles.Remove(vehicle);
-        await _unitOfWork.SaveChangesAsync();
+        unitOfWork.Vehicles.Remove(vehicle);
+        await unitOfWork.SaveChangesAsync();
 
         return true;
+    }
+
+    public async Task<VehicleResponseDto?> GetVehicleByLicensePlateAsync(string licensePlate)
+    {
+        var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.LicensePlate == licensePlate);
+        var vehicle = vehicles.FirstOrDefault();
+
+        if (vehicle is null) return null;
+
+        string? ownerName = null;
+        if (vehicle.UserId.HasValue)
+        {
+            var users = await unitOfWork.Users.FindAsync(u => u.Id == vehicle.UserId);
+            ownerName = users.FirstOrDefault()?.Name;
+        }
+
+        return new VehicleResponseDto
+        {
+            Id = vehicle.Id,
+            LicensePlate = vehicle.LicensePlate,
+            Color = vehicle.Color,
+            VehicleType = vehicle.VehicleType,
+            UserId = vehicle.UserId,
+            OwnerName = ownerName
+        };
     }
 }

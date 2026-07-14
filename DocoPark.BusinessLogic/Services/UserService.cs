@@ -9,59 +9,114 @@ namespace DocoPark.BusinessLogic.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
+    private readonly IUnitOfWork unitOfWork;
+    private readonly IMapper mapper;
 
     public UserService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
+        this.unitOfWork = unitOfWork;
+        this.mapper = mapper;
     }
 
     public async Task<IEnumerable<UserResponseDto>> GetAllUsersAsync()
     {
-        var users = await _unitOfWork.Users.GetAllAsync();
-        return _mapper.Map<IEnumerable<UserResponseDto>>(users);
+        var users = await unitOfWork.Users.GetAllAsync();
+        var results = new List<UserResponseDto>();
+
+        foreach (var user in users)
+        {
+            var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.UserId == user.Id);
+            
+            results.Add(new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                SubscriptionType = user.SubscriptionType,
+                IsPremium = user.IsPremium,
+                CreatedDate = user.CreatedDate,
+                VehicleCount = vehicles.Count()
+            });
+        }
+
+        return results;
     }
 
     public async Task<UserResponseDto?> GetUserByIdAsync(int id)
     {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
-        return user is null ? null : _mapper.Map<UserResponseDto>(user);
+        var user = await unitOfWork.Users.GetByIdAsync(id);
+        if (user is null) return null;
+
+        var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.UserId == user.Id);
+
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Phone = user.Phone,
+            SubscriptionType = user.SubscriptionType,
+            IsPremium = user.IsPremium,
+            CreatedDate = user.CreatedDate,
+            VehicleCount = vehicles.Count()
+        };
     }
 
     public async Task<UserResponseDto> CreateUserAsync(CreateUserDto dto)
     {
-        var user = _mapper.Map<User>(dto);
+        var user = mapper.Map<User>(dto);
 
-        await _unitOfWork.Users.AddAsync(user);
-        await _unitOfWork.SaveChangesAsync();
+        await unitOfWork.Users.AddAsync(user);
+        await unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<UserResponseDto>(user);
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Phone = user.Phone,
+            SubscriptionType = user.SubscriptionType,
+            IsPremium = user.IsPremium,
+            CreatedDate = user.CreatedDate,
+            VehicleCount = 0 
+        };
     }
 
     public async Task<UserResponseDto?> UpdateUserAsync(int id, UpdateUserDto dto)
     {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
+        var user = await unitOfWork.Users.GetByIdAsync(id);
         if (user is null)
             return null;
 
-        _mapper.Map(dto, user);
+        mapper.Map(dto, user);
 
-        _unitOfWork.Users.Update(user);
-        await _unitOfWork.SaveChangesAsync();
+        unitOfWork.Users.Update(user);
+        await unitOfWork.SaveChangesAsync();
 
-        return _mapper.Map<UserResponseDto>(user);
+        var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.UserId == user.Id);
+
+        return new UserResponseDto
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Email = user.Email,
+            Phone = user.Phone,
+            SubscriptionType = user.SubscriptionType,
+            IsPremium = user.IsPremium,
+            CreatedDate = user.CreatedDate,
+            VehicleCount = vehicles.Count()
+        };
     }
 
     public async Task<bool> DeleteUserAsync(int id)
     {
-        var user = await _unitOfWork.Users.GetByIdAsync(id);
+        var user = await unitOfWork.Users.GetByIdAsync(id);
         if (user is null)
             return false;
 
-        _unitOfWork.Users.Remove(user);
-        await _unitOfWork.SaveChangesAsync();
+        unitOfWork.Users.Remove(user);
+        await unitOfWork.SaveChangesAsync();
 
         return true;
     }
@@ -71,7 +126,26 @@ public class UserService : IUserService
         if (!Enum.TryParse<SubscriptionType>(subscriptionType, ignoreCase: true, out var type))
             return Enumerable.Empty<UserResponseDto>();
 
-        var users = await _unitOfWork.Users.FindAsync(u => u.SubscriptionType == type);
-        return _mapper.Map<IEnumerable<UserResponseDto>>(users);
+        var users = await unitOfWork.Users.FindAsync(u => u.SubscriptionType == type);
+        var results = new List<UserResponseDto>();
+
+        foreach (var user in users)
+        {
+            var vehicles = await unitOfWork.Vehicles.FindAsync(v => v.UserId == user.Id);
+            
+            results.Add(new UserResponseDto
+            {
+                Id = user.Id,
+                Name = user.Name,
+                Email = user.Email,
+                Phone = user.Phone,
+                SubscriptionType = user.SubscriptionType,
+                IsPremium = user.IsPremium,
+                CreatedDate = user.CreatedDate,
+                VehicleCount = vehicles.Count()
+            });
+        }
+
+        return results;
     }
 }

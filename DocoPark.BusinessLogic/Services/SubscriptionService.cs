@@ -103,6 +103,22 @@ public sealed class SubscriptionService : ISubscriptionService
         return results;
     }
 
+    public async Task<IEnumerable<SubscriptionResponseDto>> GetAllSubscriptionsAsync()
+    {
+        var allSubscriptions = await unitOfWork.Subscriptions.GetAllAsync();
+        var results = new List<SubscriptionResponseDto>();
+
+        foreach (var subscription in allSubscriptions)
+        {
+            var users = await unitOfWork.Users.FindAsync(u => u.Id == subscription.UserId);
+            var user = users.First();
+
+            results.Add(MapToResponse(subscription, user.Name));
+        }
+
+        return results;
+    }
+
     public async Task<bool> CancelSubscriptionAsync(int id)
     {
         var subscription = await unitOfWork.Subscriptions.GetByIdAsync(id);
@@ -120,6 +136,17 @@ public sealed class SubscriptionService : ISubscriptionService
             unitOfWork.Users.Update(user);
         }
 
+        await unitOfWork.SaveChangesAsync();
+
+        return true;
+    }
+
+    public async Task<bool> DeleteSubscriptionAsync(int id)
+    {
+        var subscription = await unitOfWork.Subscriptions.GetByIdAsync(id);
+        if (subscription is null) return false;
+
+        unitOfWork.Subscriptions.Remove(subscription);
         await unitOfWork.SaveChangesAsync();
 
         return true;

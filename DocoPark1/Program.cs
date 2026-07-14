@@ -6,7 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<DataContext>(options => 
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null
+        )
+    )
+);
 builder.Services.AddApplicationServices();
 
 builder.Services.AddAutoMapper(typeof(UserMappingProfile).Assembly);
@@ -51,7 +60,6 @@ var app = builder.Build();
 
 app.UseGlobalExceptionHandling();
 
-// Use CORS - MUST be before UseApiKeyAuthentication and other middleware
 app.UseCors("AllowFrontend");
 
 app.UseApiKeyAuthentication();
